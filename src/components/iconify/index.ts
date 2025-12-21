@@ -1,5 +1,3 @@
+export { Iconify } from './iconify';
 export * from './classes';
-
-export * from './iconify';
-
 export * from './register-icons';

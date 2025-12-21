@@ -11,18 +11,52 @@ import InputAdornment from '@mui/material/InputAdornment';
 
 import { useRouter } from 'src/routes/hooks';
 
+import api from 'src/services/api';
+
 import { Iconify } from 'src/components/iconify';
 
-// ----------------------------------------------------------------------
 
+// ----------------------------------------------------------------------
 export function SignInView() {
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
   const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignIn = useCallback(() => {
-    router.push('/');
-  }, [router]);
+  // const handleSignIn = useCallback(() => {
+  //   router.push('/');
+  // }, [router]);
+  const handleSignIn = useCallback(async () => {
+    try {
+      setLoading(true);
+
+      const res = await api.post('/users/login', {
+        email,
+        password,
+      });
+
+      if (res.data.user.role !== 'admin') {
+        alert('Bạn không có quyền admin');
+        return;
+      }
+
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('admin', JSON.stringify(res.data.user));
+
+      router.push('/');
+    }
+    catch (error: any) {
+      console.log('LOGIN ERROR:', error.response?.data || error.message);
+      alert(error.response?.data?.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
+  }, [email, password, router]);
+
 
   const renderForm = (
     <Box
@@ -36,7 +70,8 @@ export function SignInView() {
         fullWidth
         name="email"
         label="Email address"
-        defaultValue="hello@gmail.com"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
         sx={{ mb: 3 }}
         slotProps={{
           inputLabel: { shrink: true },
@@ -51,7 +86,9 @@ export function SignInView() {
         fullWidth
         name="password"
         label="Password"
-        defaultValue="@demo1234"
+        // defaultValue="@demo1234"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
         type={showPassword ? 'text' : 'password'}
         slotProps={{
           inputLabel: { shrink: true },
@@ -71,7 +108,6 @@ export function SignInView() {
       <Button
         fullWidth
         size="large"
-        type="submit"
         color="inherit"
         variant="contained"
         onClick={handleSignIn}
