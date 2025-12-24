@@ -13,17 +13,54 @@ export type ProductItemProps = {
   calories: number;
   imageUrl: string;
   description?: string;
+
+  macronutrients: {
+    protein: number;
+    carbs: number;
+    fat: number;
+    fiber: number;
+  };
+
+  micronutrients: {
+    vitaminA: number;
+    vitaminC: number;
+    calcium: number;
+    iron: number;
+    potassium: number;
+  };
+
+  portionSize: {
+    value: number;
+    unit: string;
+  };
 };
 
-export function ProductItem({ product }: { product: ProductItemProps }) {
+type Props = {
+  product: ProductItemProps;
+  onClick: (food: ProductItemProps) => void;
+};
+
+// ----------------------------------------------------------------------
+
+export function ProductItem({ product, onClick }: Props) {
   return (
-    <Card>
+    <Card
+      onClick={() => onClick(product)}
+      sx={{
+        cursor: 'pointer',
+        transition: '0.2s',
+        '&:hover': {
+          boxShadow: 6,
+          transform: 'translateY(-2px)',
+        },
+      }}
+    >
       {/* IMAGE */}
       <Box sx={{ pt: '100%', position: 'relative' }}>
         <Box
           component="img"
           alt={product.name}
-          src={product.imageUrl}
+          src={product.imageUrl || '/placeholder.png'}
           sx={{
             top: 0,
             width: 1,
@@ -35,7 +72,7 @@ export function ProductItem({ product }: { product: ProductItemProps }) {
       </Box>
 
       {/* CONTENT */}
-      <Stack spacing={1.5} sx={{ p: 3 }}>
+      <Stack spacing={1.2} sx={{ p: 2.5 }}>
         <Link color="inherit" underline="hover" variant="subtitle2" noWrap>
           {product.name}
         </Link>

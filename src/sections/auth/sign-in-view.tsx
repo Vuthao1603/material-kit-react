@@ -27,9 +27,7 @@ export function SignInView() {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  // const handleSignIn = useCallback(() => {
-  //   router.push('/');
-  // }, [router]);
+
   const handleSignIn = useCallback(async () => {
     try {
       setLoading(true);
@@ -39,23 +37,30 @@ export function SignInView() {
         password,
       });
 
-      if (res.data.user.role !== 'admin') {
+      const { token, user } = res.data;
+
+      // ❌ Không phải admin
+      if (user.role !== 'admin') {
         alert('Bạn không có quyền admin');
         return;
       }
 
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('admin', JSON.stringify(res.data.user));
+      // ✅ LƯU TOKEN
+      localStorage.setItem('token', token);
 
+      // ✅ LƯU ADMIN INFO
+      localStorage.setItem('admin', JSON.stringify(user));
+
+      // 👉 redirect vào dashboard
       router.push('/');
-    }
-    catch (error: any) {
-      console.log('LOGIN ERROR:', error.response?.data || error.message);
+    } catch (error: any) {
+      console.error('LOGIN ERROR:', error.response?.data || error.message);
       alert(error.response?.data?.message || 'Login failed');
     } finally {
       setLoading(false);
     }
   }, [email, password, router]);
+
 
 
   const renderForm = (
@@ -86,7 +91,6 @@ export function SignInView() {
         fullWidth
         name="password"
         label="Password"
-        // defaultValue="@demo1234"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         type={showPassword ? 'text' : 'password'}
@@ -111,8 +115,9 @@ export function SignInView() {
         color="inherit"
         variant="contained"
         onClick={handleSignIn}
+        disabled={loading}
       >
-        Sign in
+        {loading ? 'Signing in...' : 'Sign in'}
       </Button>
     </Box>
   );
