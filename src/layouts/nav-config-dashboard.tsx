@@ -29,7 +29,7 @@ export const navData = [
     icon: icon('ic-cart'),
   },
   {
-    title: 'Blog',
+    title: 'Menu healthy',
     path: '/blog',
     icon: icon('ic-blog'),
   },
